@@ -12,3 +12,4 @@ library pointycastle.pointycastle;
 
 export "package:pointycastle/api.dart";
 export "package:pointycastle/impl.dart";
+export "package:pointycastle/registry_export.dart";

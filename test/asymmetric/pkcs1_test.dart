@@ -11,6 +11,8 @@ import "../test/src/null_asymmetric_block_cipher.dart";
 import "../test/src/null_secure_random.dart";
 
 void main() {
+  addFactoryToRegistry(NullAsymmetricBlockCipher.FACTORY_CONFIG, null);
+  addFactoryToRegistry(NullSecureRandom.FACTORY_CONFIG, () => new NullSecureRandom());
 
   var pubpar = () => new ParametersWithRandom(new PublicKeyParameter(new NullPublicKey()), new NullSecureRandom());
   var privpar = () => new ParametersWithRandom(new PrivateKeyParameter(new NullPrivateKey()), new NullSecureRandom());
@@ -28,4 +30,3 @@ void main() {
   ]);
 
 }
-

@@ -4,15 +4,18 @@
 
 library pointycastle.src.registry;
 
-import "package:reflectable/reflectable.dart";
+//import "package:reflectable/reflectable.dart";
 import "package:quiver_collection/collection.dart";
 
 import "package:pointycastle/api.dart";
+
+import 'factories.dart';
 
 import "factory_config.dart";
 export "factory_config.dart";
 
 part "registrable.dart";
+
 
 
 
@@ -26,13 +29,13 @@ final FactoryRegistry registry = new FactoryRegistry();
 ///   a static `FACTORY_CONFIG` variable.
 class FactoryRegistry {
 
-  static const String FIELD = "FACTORY_CONFIG";
+//  static const String FIELD = "FACTORY_CONFIG";
 
   static const int CONSTRUCTOR_CACHE_SIZE = 25;
 
-  static const Reflectable reflector = const RegistryImplementationReflector();
-  static final ClassMirror registrable = reflector.annotatedClasses.firstWhere(
-      (cm) => cm.qualifiedName == "pointycastle.src.registry.Registrable");
+//  static const Reflectable reflector = const RegistryImplementationReflector();
+//  static final ClassMirror registrable = reflector.annotatedClasses.firstWhere(
+//      (cm) => cm.qualifiedName == "pointycastle.src.registry.Registrable");
 
   final Map<Type, Map<String, RegistrableConstructor>> staticFactories;
   final Map<Type, Set<DynamicFactoryConfig>> dynamicFactories;
@@ -89,28 +92,25 @@ class FactoryRegistry {
   }
 
   void initialize() {
-    for(ClassMirror mirror in reflector.annotatedClasses) {
-      if (!mirror.staticMembers.containsKey(FIELD)) {
-        // no factory found
-        continue;
-      }
-      FactoryConfig config = mirror.invokeGetter(FIELD);
-      // check if dynamic or static factory
-      if (config is StaticFactoryConfig) {
-        // static factory
-        _addStaticFactoryConfig(config, mirror);
-      } else if (config is DynamicFactoryConfig) {
-        // dynamic factory
-        _addDynamicFactoryConfig(config);
-      }
-    }
+    addFactoriesToRegistry();
     initialized = true;
   }
 
-  void _addStaticFactoryConfig(StaticFactoryConfig config, ClassMirror mirror) {
+  void addFactory(FactoryConfig config, RegistrableConstructor contr) {
+    // check if dynamic or static factory
+    if (config is StaticFactoryConfig) {
+      // static factory
+      _addStaticFactoryConfig(config, contr);
+    } else if (config is DynamicFactoryConfig) {
+      // dynamic factory
+      _addDynamicFactoryConfig(config);
+    }
+  }
+
+  void _addStaticFactoryConfig(StaticFactoryConfig config, RegistrableConstructor contr) {
     Map factories = staticFactories.putIfAbsent(config.type,
         () => new Map<String, RegistrableConstructor>());
-    factories[config.algorithmName] = _createStaticFactory(mirror);
+    factories[config.algorithmName] = contr; //_createStaticFactory(mirror);
   }
 
   void _addDynamicFactoryConfig(DynamicFactoryConfig config) {
@@ -122,16 +122,15 @@ class FactoryRegistry {
 }
 
 
-class RegistryImplementationReflector extends Reflectable {
-  const RegistryImplementationReflector()
-    : super(
-      declarationsCapability,
-      newInstanceCapability,
-      staticInvokeCapability,
-      subtypeQuantifyCapability
-    );
-}
-
-RegistrableConstructor _createStaticFactory(ClassMirror classMirror) =>
-    () => classMirror.newInstance("", []);
-
+// class RegistryImplementationReflector extends Reflectable {
+//   const RegistryImplementationReflector()
+//     : super(
+//       declarationsCapability,
+//       newInstanceCapability,
+//       staticInvokeCapability,
+//       subtypeQuantifyCapability
+//     );
+// }
+//
+// RegistrableConstructor _createStaticFactory(ClassMirror classMirror) =>
+//     () => classMirror.newInstance("", []);
